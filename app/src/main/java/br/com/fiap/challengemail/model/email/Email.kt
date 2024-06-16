@@ -7,25 +7,12 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "TBL_EMAIL",
-    indices = [
-        Index(value = ["DS_REMETENTE"]),
-        Index(value = ["DS_DESTINATARIO"]),
-        Index(value = ["CD_CATEGORIA"])
-    ],
-    foreignKeys = [
-        ForeignKey(
-            entity = Categoria::class,
-            parentColumns = ["CD_EMAIL"],
-            childColumns = ["CD_CATEGORIA"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
+    tableName = "TBL_EMAIL"
 )
 data class Email(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "CD_EMAIL")
-    val id: Long = 0,
+    val id: Int = 0,
 
     @ColumnInfo(name = "DS_ASSUNTO")
     val assunto: String = "",
@@ -45,11 +32,14 @@ data class Email(
     @ColumnInfo(name = "FL_LIDO")
     val isRead: Boolean = false,
 
-    @ColumnInfo(name = "CD_CATEGORIA")
-    val categoria: Categoria = Categoria(),
-
     @ColumnInfo(name = "FL_FAVORITO")
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+
+    @ColumnInfo(name = "FL_DELETADO")
+    val isDeleted: Boolean = false,
+
+    @ColumnInfo(name = "DS_LIST_TAGS")
+    var tags: String = ""
 )
 
 

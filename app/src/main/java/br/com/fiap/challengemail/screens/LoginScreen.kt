@@ -48,8 +48,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import br.com.fiap.challengemail.model.email.Email
 import br.com.fiap.challengemail.model.usuario.Usuario
 import br.com.fiap.challengemail.repository.AuthRepository
+import br.com.fiap.challengemail.repository.EmailRepository
 import br.com.fiap.challengemail.repository.UsuarioRepository
 import br.com.fiap.challengemail.screens.complements.AppInfo
 
@@ -99,6 +101,7 @@ fun LoginScreen(modifier: Modifier = Modifier, navController: NavController) {
 
     val context = LocalContext.current
     val authRepository = AuthRepository(context)
+    val usuarioRepository = UsuarioRepository(context)
 
     var loginResult by remember { mutableStateOf(false) }
 
@@ -189,7 +192,8 @@ fun LoginScreen(modifier: Modifier = Modifier, navController: NavController) {
                     if (loginResult) {
                         Toast.makeText(context, "Login Efetuado com sucesso", Toast.LENGTH_SHORT)
                             .show()
-                        navController.navigate("Home")
+                        val user = usuarioRepository.getUserByEmail(username)
+                        navController.navigate("Home/${user.id}")
                     } else {
                         Toast.makeText(context, "Usuário e senha inválidos", Toast.LENGTH_SHORT)
                             .show()
@@ -214,10 +218,12 @@ fun LoginScreen(modifier: Modifier = Modifier, navController: NavController) {
                     } else {
                         Modifier
                     },
-                    color = if (false) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    color = if (false) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(
+                        alpha = 0.6f
+                    ),
                     fontWeight = FontWeight.ExtraBold,
 
-                )
+                    )
             }
         }
 
@@ -233,9 +239,9 @@ fun isValidPassword(password: String): Boolean {
     return password.length >= 6  // Mínimo de 6 caracteres
 }
 
-fun popularDados(context : Context){
+fun popularDados(context: Context) {
     val usuarioRepository = UsuarioRepository(context)
-    if (usuarioRepository.getUserByEmail("admin@admin.com").id <= 0){
+    if (usuarioRepository.getUserByEmail("admin@admin.com").id <= 0) {
         val usuarioAdmin = Usuario(
             name = "Admin",
             email = "admin@admin.com",
@@ -245,5 +251,36 @@ fun popularDados(context : Context){
         usuarioRepository.createUser(usuarioAdmin)
     }
 
+    val emailRepository = EmailRepository(context)
 
+    if (emailRepository.getAllEmails("admin@admin.com").isEmpty()) {
+        val emails = mutableListOf<Email>()
+
+        // Criação de 10 objetos Email e adição à lista
+        for (i in 1..10) {
+            val email = Email(
+                assunto = "Assunto $i",
+                corpo = "Corpo $i",
+                dataEnvio = "2023-05-01",
+                destinatario = "admin@admin.com",
+                remetente = "Remetente $i"
+            )
+            emails.add(email)
+        }
+
+        for (email in 0..4){
+            emails[email].tags = "tag1, tag2"
+        }
+
+        for (email in 5..9){
+            emails[email].tags = "tag2"
+        }
+
+        for(email in emails){
+            emailRepository.createEmail(email)
+        }
+    }
 }
+
+
+

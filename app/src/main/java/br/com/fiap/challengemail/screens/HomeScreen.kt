@@ -23,11 +23,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -47,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import br.com.fiap.challengemail.model.email.Email
@@ -141,7 +137,7 @@ fun EmailFloatingActionButton(navController: NavController, idLogin: String) {
             ) {
                 FloatingActionButton(
                     onClick = {
-                        navController.navigate("NewEmail/${idLogin}")
+
                     },
                     shape = CircleShape,
                     containerColor = Color.Transparent,
@@ -169,7 +165,7 @@ fun EmailFloatingActionButton(navController: NavController, idLogin: String) {
 
                 FloatingActionButton(
                     onClick = {
-                        // Ação quando clicar na opção 1
+                        navController.navigate("calendar")
                     },
                     shape = CircleShape,
                     containerColor = Color.Transparent,

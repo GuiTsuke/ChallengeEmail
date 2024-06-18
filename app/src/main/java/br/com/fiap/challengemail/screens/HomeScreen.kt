@@ -165,7 +165,6 @@ fun EmailFloatingActionButton(navController: NavController, idLogin: String) {
 
                 FloatingActionButton(
                     onClick = {
-                        navController.navigate("calendar")
                     },
                     shape = CircleShape,
                     containerColor = Color.Transparent,

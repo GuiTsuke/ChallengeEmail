@@ -13,8 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import br.com.fiap.challengemail.screens.CalendarioView
-import br.com.fiap.challengemail.screens.CalendarioViewModel
 import br.com.fiap.challengemail.screens.HomeView
 import br.com.fiap.challengemail.screens.LoadHomeScreen
 import br.com.fiap.challengemail.screens.LoadLoginScreen
@@ -54,9 +52,6 @@ class MainActivity : ComponentActivity() {
                         composable("EmailDetail/{id}") {
                             val id = it.arguments?.getString("id")
                             LoadViewEmailScreen(navController, id)
-                        }
-                        composable("calendar") {
-                            CalendarioView(navController, viewModel = CalendarioViewModel())
                         }
                     }
 

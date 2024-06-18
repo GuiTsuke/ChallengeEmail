@@ -13,9 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import br.com.fiap.challengemail.screens.CalendarioView
+import br.com.fiap.challengemail.screens.CalendarioViewModel
+import br.com.fiap.challengemail.screens.HomeView
 import br.com.fiap.challengemail.screens.LoadHomeScreen
 import br.com.fiap.challengemail.screens.LoadLoginScreen
 import br.com.fiap.challengemail.screens.LoadSignupScreen
+import br.com.fiap.challengemail.screens.LoadViewEmailScreen
 import br.com.fiap.challengemail.ui.theme.ChallengeEmailTheme
 
 class MainActivity : ComponentActivity() {
@@ -32,8 +36,11 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(
                         navController = navController,
-                        startDestination = "login"
+                        startDestination = "start"
                     ) {
+                        composable("start") {
+                            HomeView(navController)
+                        }
                         composable("login") {
                             LoadLoginScreen("Login", navController)
                         }
@@ -43,6 +50,13 @@ class MainActivity : ComponentActivity() {
                         composable("home/{id}") {
                             val id = it.arguments?.getString("id")
                             LoadHomeScreen(navController, id)
+                        }
+                        composable("EmailDetail/{id}") {
+                            val id = it.arguments?.getString("id")
+                            LoadViewEmailScreen(navController, id)
+                        }
+                        composable("calendar") {
+                            CalendarioView(navController, viewModel = CalendarioViewModel())
                         }
                     }
 

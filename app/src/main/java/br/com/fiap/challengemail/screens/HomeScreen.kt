@@ -2,6 +2,7 @@ package br.com.fiap.challengemail.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,14 +19,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -90,14 +95,13 @@ fun EmailListScreen(navController: NavController, idLogin: String) {
     Scaffold(
         topBar = { EmailTopAppBar() },
         floatingActionButton = {
-            EmailFloatingActionButton()
+            EmailFloatingActionButton(navController, idLogin)
 
         },
         floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
-            EmailFilterRow()
-            EmailList(emails = emails)
+            EmailFilterRow(navController, idLogin)
         }
     }
 }
@@ -116,7 +120,7 @@ fun EmailTopAppBar() {
 }
 
 @Composable
-fun EmailFloatingActionButton() {
+fun EmailFloatingActionButton(navController: NavController, idLogin: String) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -137,13 +141,15 @@ fun EmailFloatingActionButton() {
             ) {
                 FloatingActionButton(
                     onClick = {
-                        // Ação quando clicar na opção 1
+                        navController.navigate("NewEmail/${idLogin}")
                     },
                     shape = CircleShape,
-                    containerColor = Color.Transparent){
+                    containerColor = Color.Transparent,
+                    elevation = FloatingActionButtonDefaults.elevation(0.dp)){
                     Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = "Opção 1"
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Opção 1",
+                        modifier = Modifier.size(48.dp)
                     )
                 }
 
@@ -152,10 +158,12 @@ fun EmailFloatingActionButton() {
                         // Ação quando clicar na opção 1
                     },
                     shape = CircleShape,
-                    containerColor = Color.Transparent){
+                    containerColor = Color.Transparent,
+                    elevation = FloatingActionButtonDefaults.elevation(0.dp)){
                     Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = "Opção 1"
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Opção 2",
+                        modifier = Modifier.size(48.dp)
                     )
                 }
 
@@ -164,10 +172,12 @@ fun EmailFloatingActionButton() {
                         // Ação quando clicar na opção 1
                     },
                     shape = CircleShape,
-                    containerColor = Color.Transparent){
+                    containerColor = Color.Transparent,
+                    elevation = FloatingActionButtonDefaults.elevation(0.dp)){
                     Icon(
                         imageVector = Icons.Default.DateRange,
-                        contentDescription = "Opção 1"
+                        contentDescription = "Opção 3",
+                        modifier = Modifier.size(48.dp)
                     )
                 }
 
@@ -177,57 +187,83 @@ fun EmailFloatingActionButton() {
     }
 
 @Composable
-fun EmailFilterRow() {
+fun EmailFilterRow(navController: NavController, idLogin: String) {
+    val context = LocalContext.current
+    val emailRepository = EmailRepository(context)
+    val usuarioRepository = UsuarioRepository(context)
+
+    val user = usuarioRepository.getUserById(idLogin.toInt())
+
+    var emails by remember{mutableStateOf(emailRepository.getAllEmails(user.email))}
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Text(text = "Tudo", fontWeight = FontWeight.Bold)
-        Text(text = "Lidos")
-        Text(text = "Não lidos")
-        Text(text = "Enviados")
-        Text(text = "Deletado")
+        Text(text = "Tudo", modifier = Modifier.clickable(
+            onClick = {
+                emails = emailRepository.getAllEmails(user.email)
+            }
+        ))
+        Text(text = "Enviados", modifier = Modifier.clickable(
+            onClick = {
+                emails = emailRepository.getAllEmails(user.email).filter { it.remetente == "admin@admin.com" } }
+        ))
+        Text(text = "Deletado", modifier = Modifier.clickable(
+            onClick = { emails = emailRepository.getAllEmails(user.email).filter { it.isDeleted } }
+        ))
+        Text(text = "Tag 1", modifier = Modifier.clickable(
+            onClick = { emails = emailRepository.getAllEmails(user.email).filter { it.tags == "Tag 1" } }
+        ))
+        Text(text = "Tag 2", modifier = Modifier.clickable(
+            onClick = { emails = emailRepository.getAllEmails(user.email).filter { it.tags == "Tag 2" } }
+        ))
     }
+
+    EmailList(emails = emails, navController)
 }
 
 @Composable
-fun EmailList(emails: List<Email>) {
+fun EmailList(emails: List<Email>, navController: NavController) {
     LazyColumn {
         items(emails) { email ->
-            EmailItem(email)
+            EmailItem(email, navController)
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EmailItem(email: Email) {
-    var anexo by remember { mutableStateOf("") }
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(MaterialTheme.colorScheme.primary, CircleShape)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Column {
-                Text(text = email.remetente, fontWeight = FontWeight.Bold)
-                Text(text = email.assunto)
+fun EmailItem(email: Email, navController: NavController) {
+    Card(
+        onClick = {
+            navController.navigate("EmailDetail/${email.id}")
+        },
+        modifier = Modifier.padding(8.dp)
+    ){
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(MaterialTheme.colorScheme.primary, CircleShape)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Column {
+                    Text(text = email.remetente, fontWeight = FontWeight.Bold)
+                    Text(text = email.assunto)
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Text(text = email.dataEnvio, color = Color.Gray)
             }
-            Spacer(modifier = Modifier.weight(1f))
-            Text(text = email.dataEnvio, color = Color.Gray)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = email.corpo)
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = email.corpo)
     }
-}
 
-@Preview
-@Composable
-private fun Botoes() {
-    EmailFloatingActionButton()
+
 }

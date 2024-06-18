@@ -36,7 +36,7 @@ data class Email(
     val isFavorite: Boolean = false,
 
     @ColumnInfo(name = "FL_DELETADO")
-    val isDeleted: Boolean = false,
+    var isDeleted: Boolean = false,
 
     @ColumnInfo(name = "DS_LIST_TAGS")
     var tags: String = ""

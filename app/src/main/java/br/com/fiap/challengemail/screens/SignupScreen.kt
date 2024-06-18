@@ -97,7 +97,7 @@ fun SignupScreen(modifier: Modifier, navController: NavController) {
         ConfirmationDialog(
             onConfirm = {
                 showDialogBackLogin = false
-                navController.popBackStack("login", inclusive = false)
+                navController.popBackStack()
             },
             onDismiss = {
                 showDialogBackLogin = false

@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -39,7 +38,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
@@ -257,7 +255,7 @@ fun popularDados(context: Context) {
         val emails = mutableListOf<Email>()
 
         // Criação de 10 objetos Email e adição à lista
-        for (i in 1..10) {
+        for (i in 1..9) {
             val email = Email(
                 assunto = "Assunto $i",
                 corpo = "Corpo $i",
@@ -265,16 +263,24 @@ fun popularDados(context: Context) {
                 destinatario = "admin@admin.com",
                 remetente = "Remetente $i"
             )
+
+            if(i % 2 == 0){
+                email.tags = "Tag 1"
+                email.isDeleted = true
+            }else{
+                email.tags = "Tag 2"
+            }
             emails.add(email)
         }
 
-        for (email in 0..4){
-            emails[email].tags = "tag1, tag2"
-        }
-
-        for (email in 5..9){
-            emails[email].tags = "tag2"
-        }
+            val email = Email(
+                assunto = "Assunto 10",
+                corpo = "Corpo 10",
+                dataEnvio = "2025-05-01",
+                destinatario = "Destinatario 10",
+                remetente = "admin@admin.com"
+            )
+            emails.add(email)
 
         for(email in emails){
             emailRepository.createEmail(email)
